@@ -1,8 +1,10 @@
 const { response } = require('express');
 const User = require('./user');
+const bcrypt = require('bcryptjs');
+const { tokenGenerator } = require('../../helpers/tokenGenerator')
 
 const CreateUser = async (req, res = response) => {
-    const { email, pasword } = req.body;
+    const { email, password } = req.body;
     try {
         const isFoundUser = await User.findOne({
             email: email
@@ -15,11 +17,19 @@ const CreateUser = async (req, res = response) => {
         }
 
         const newUser = new User(req.body);
-        await newUser.save();
 
+        // Encrypting password
+        const salt = bcrypt.genSaltSync();
+        newUser.password = bcrypt.hashSync(password, salt);
+
+        await newUser.save();
+        const generatedToken = await tokenGenerator(newUser.uid, newUser.name)
+
+        newUser.password = "****";
         return res.status(201).json({
             Message: null,
-            Data: newUser
+            Data: newUser,
+            Token: generatedToken
         });
 
     } catch (error) {
@@ -31,6 +41,6 @@ const CreateUser = async (req, res = response) => {
     }
 };
 
-module.exports = (
+module.exports = {
     CreateUser
-)
+}

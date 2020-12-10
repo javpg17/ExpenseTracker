@@ -2,7 +2,7 @@ const { Router } = require('express');
 const express = require('express');
 const { check } = require('express-validator');
 const { fieldValidator } = require('../../middlewares/fieldValidator');
-const { CreateUser } = require('../users/userAppService');
+const { CreateUser } = require('./userAppService');
 
 const router = express.Router();
 
@@ -19,4 +19,4 @@ router.post(
     CreateUser
 );
 
-module.exports.router;
+module.exports = router;
